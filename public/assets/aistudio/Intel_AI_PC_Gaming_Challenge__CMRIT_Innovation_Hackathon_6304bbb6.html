@@ -1,0 +1,2308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="tool">
+  <meta name="design-style" content="neon_noir">
+  <title>Intel AI PC Quest — Beat the Retail Trap</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@100;200;300;400;500;600;700;800&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@1.43.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+
+      /* 1. Neon Noir Palette & Surfaces */
+      --background: #0a0a12;
+      --surface-container-low: #111118;
+      --surface-container: #141422;
+      --surface-container-high: #1e1e30;
+
+      /* Text */
+      --on-surface: #e8e0f0;
+      --on-surface-variant: #a098b0;
+
+      /* Lines */
+      --outline: #5a5068;
+      --outline-variant: #302840;
+
+      /* Neon Accents */
+      --primary: #ff2d78;
+      --on-primary: #1a0010;
+      --primary-container: #b3004e;
+      --on-primary-container: #ffe0ec;
+      --secondary: #00ffcc;
+      --on-secondary: #001a14;
+      --tertiary: #ffe04a;
+      --error: #ff4444;
+      --on-error: #1a0000;
+
+      /* Data Series */
+      --data-1: #ff2d78;
+      --data-2: #00ffcc;
+      --data-3: #ffe04a;
+      --data-4: #b388ff;
+      --data-context: #6e6680;
+      --data-1-fill: rgba(255, 45, 120, 0.22);
+      --data-2-fill: rgba(0, 255, 204, 0.25);
+      --data-3-fill: rgba(255, 224, 74, 0.22);
+      --data-context-fill: rgba(110, 102, 128, 0.25);
+
+      /* Fonts */
+      --font-headline: 'Sora', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-label: 'Space Mono', monospace;
+
+      /* Shape */
+      --rounded: 0.125rem;
+      --rounded-lg: 0.25rem;
+      --rounded-full: 0.75rem;
+
+      /* Style Effects */
+      --glow-text: 0 0 8px currentColor;
+      --glow-primary: 0 0 16px color-mix(in srgb, var(--primary) 40%, transparent);
+      --glow-secondary: 0 0 16px color-mix(in srgb, var(--secondary) 35%, transparent);
+      --glow-tertiary: 0 0 14px color-mix(in srgb, var(--tertiary) 35%, transparent);
+      --neon-border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+      --neon-border-lit: 1px solid color-mix(in srgb, var(--primary) 50%, transparent);
+      --cyan-border: 1px solid color-mix(in srgb, var(--secondary) 30%, transparent);
+      --cyan-border-lit: 1px solid color-mix(in srgb, var(--secondary) 55%, transparent);
+      --tertiary-border: 1px solid color-mix(in srgb, var(--tertiary) 40%, transparent);
+      --neon-inset: inset 0 0 12px color-mix(in srgb, var(--primary) 10%, transparent);
+      --cyan-inset: inset 0 0 12px color-mix(in srgb, var(--secondary) 10%, transparent);
+      --glow-line: drop-shadow(0 0 4px currentColor);
+      --scanlines: repeating-linear-gradient(to bottom, transparent 0 3px, color-mix(in srgb, var(--on-surface) 3%, transparent) 3px 4px);
+
+      /* 3. Shared Foundation Tokens */
+      --positive: #00ffcc;
+      --warning: #ffe04a;
+      --focus: #00ffcc;
+
+      /* Focused Tool Type Scale */
+      --display-size: clamp(1.85rem, 1.35rem + 1.8vw, 2.75rem);
+      --headline-size: clamp(1.3rem, 1.08rem + 0.65vw, 1.65rem);
+      --subhead-size: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+      --body-size: clamp(0.9375rem, 0.9rem + 0.15vw, 1rem);
+      --label-size: 0.75rem;
+
+      /* Spacing Scale */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+      --space-3xl: 6rem;
+
+      /* Motion */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --dur-micro: 120ms;
+      --dur-short: 220ms;
+      --dur-long: 420ms;
+    }
+
+    /* Base Reset */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      overflow-x: clip;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background);
+      background-image: var(--scanlines);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    header { position: static !important; }
+    button, input, select, textarea { font-family: inherit; }
+
+    :focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .page-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.7fr) minmax(290px, 0.85fr);
+      gap: var(--space-lg);
+      padding: var(--space-lg);
+      max-width: 1280px;
+      margin: 0 auto;
+      align-items: start;
+    }
+    .page-grid * { min-width: 0; }
+
+    .main-column {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xl);
+    }
+
+    .hud-column {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    /* Typography */
+    h1, h2, h3, h4 {
+      font-family: var(--font-headline);
+      color: var(--on-surface);
+      margin: 0;
+    }
+    h1 {
+      font-size: var(--display-size);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.08;
+    }
+    h2 {
+      font-size: var(--headline-size);
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      line-height: 1.18;
+    }
+    h3 {
+      font-size: var(--subhead-size);
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      line-height: 1.25;
+    }
+    p {
+      margin: 0;
+      color: var(--on-surface);
+      max-width: 65ch;
+    }
+    .muted {
+      color: var(--on-surface-variant);
+    }
+
+    .kicker {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--secondary);
+      text-shadow: var(--glow-text);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    .kicker.is-pink {
+      color: var(--primary);
+    }
+    .kicker.is-yellow {
+      color: var(--tertiary);
+    }
+
+    .label-mono {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--on-surface-variant);
+    }
+
+    .neon-text {
+      color: var(--primary);
+      text-shadow: var(--glow-text);
+    }
+    .cyan-text {
+      color: var(--secondary);
+      text-shadow: var(--glow-text);
+    }
+    .yellow-text {
+      color: var(--tertiary);
+    }
+
+    /* Neon Noir Containers */
+    .neon-panel {
+      background: var(--surface-container);
+      border: var(--neon-border);
+      box-shadow: var(--neon-inset);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+    }
+    .neon-panel.is-cyan {
+      border: var(--cyan-border);
+      box-shadow: var(--cyan-inset);
+    }
+    .neon-panel.is-subtle {
+      background: var(--surface-container-low);
+      border: 1px solid var(--outline-variant);
+      box-shadow: none;
+    }
+
+    /* Hero Header */
+    .hero-block {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+      padding-bottom: var(--space-lg);
+      border-bottom: 1px solid var(--outline-variant);
+    }
+    .hero-lede {
+      font-size: var(--subhead-size);
+      color: var(--on-surface-variant);
+      max-width: 62ch;
+    }
+    .setup-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+      gap: var(--space-md);
+      margin-top: var(--space-xs);
+    }
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    /* Interactive Buttons & Chips (Machined 2-4px corners, dark fill, neon edge) */
+    .btn-neon {
+      background: var(--surface-container);
+      color: var(--primary);
+      border: var(--neon-border-lit);
+      border-radius: var(--rounded);
+      padding: var(--space-sm) var(--space-lg);
+      min-height: 44px;
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      transition: box-shadow var(--dur-short) var(--ease-out),
+                  border-color var(--dur-short) var(--ease-out),
+                  background-color var(--dur-short) var(--ease-out),
+                  transform var(--dur-micro) var(--ease-out);
+    }
+    .btn-neon:hover:not(:disabled) {
+      border-color: var(--primary);
+      box-shadow: var(--glow-primary);
+      text-shadow: var(--glow-text);
+    }
+    .btn-neon:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+    .btn-neon:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-neon.is-cyan {
+      color: var(--secondary);
+      border: var(--cyan-border-lit);
+    }
+    .btn-neon.is-cyan:hover:not(:disabled) {
+      border-color: var(--secondary);
+      box-shadow: var(--glow-secondary);
+      text-shadow: var(--glow-text);
+    }
+
+    .btn-neon.is-ghost {
+      color: var(--on-surface-variant);
+      border: 1px solid var(--outline);
+    }
+    .btn-neon.is-ghost:hover:not(:disabled) {
+      color: var(--on-surface);
+      border-color: var(--on-surface);
+      box-shadow: none;
+      text-shadow: none;
+    }
+
+    .chip-btn {
+      background: var(--surface-container-low);
+      color: var(--on-surface-variant);
+      border: 1px solid var(--outline);
+      border-radius: var(--rounded);
+      padding: var(--space-xs) var(--space-md);
+      min-height: 44px;
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      transition: background-color var(--dur-short) var(--ease-out),
+                  border-color var(--dur-short) var(--ease-out),
+                  color var(--dur-short) var(--ease-out),
+                  box-shadow var(--dur-short) var(--ease-out);
+    }
+    .chip-btn:hover {
+      color: var(--on-surface);
+      border-color: var(--secondary);
+    }
+    .chip-btn[aria-pressed="true"] {
+      background: var(--surface-container-high);
+      color: var(--secondary);
+      border-color: var(--secondary);
+      box-shadow: var(--glow-secondary);
+      text-shadow: var(--glow-text);
+    }
+    .chip-btn.is-pink[aria-pressed="true"] {
+      color: var(--primary);
+      border-color: var(--primary);
+      box-shadow: var(--glow-primary);
+      text-shadow: var(--glow-text);
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      padding: 0.2rem 0.55rem;
+      border-radius: var(--rounded);
+      font-family: var(--font-label);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border: 1px solid var(--outline);
+      color: var(--on-surface-variant);
+      background: transparent;
+    }
+    .badge.is-pink { border-color: var(--primary); color: var(--primary); }
+    .badge.is-cyan { border-color: var(--secondary); color: var(--secondary); }
+    .badge.is-yellow { border-color: var(--tertiary); color: var(--tertiary); }
+    .badge.is-error { border-color: var(--error); color: var(--error); }
+
+    /* Stage Sections */
+    .stage-section {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+      scroll-margin-top: var(--space-lg);
+    }
+    .stage-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: var(--space-sm);
+    }
+    .stage-title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    /* HUD Rail */
+    .hud-grid-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-sm);
+    }
+    .metric-tile {
+      background: var(--surface-container-low);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .metric-val {
+      font-family: var(--font-headline);
+      font-size: 1.5rem;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      background: var(--surface-container-low);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--rounded);
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--secondary);
+      transition: width var(--dur-short) var(--ease-out);
+    }
+    .progress-fill.is-pink {
+      background: var(--primary);
+    }
+    .progress-fill.is-yellow {
+      background: var(--tertiary);
+    }
+    .progress-fill.is-error {
+      background: var(--error);
+    }
+
+    .stage-nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .stage-nav-btn {
+      width: 100%;
+      min-height: 44px;
+      background: var(--surface-container-low);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--rounded);
+      padding: var(--space-sm) var(--space-md);
+      color: var(--on-surface-variant);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+      cursor: pointer;
+      text-align: left;
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      transition: border-color var(--dur-short) var(--ease-out),
+                  background-color var(--dur-short) var(--ease-out),
+                  color var(--dur-short) var(--ease-out);
+    }
+    .stage-nav-btn:hover {
+      border-color: var(--secondary);
+      color: var(--on-surface);
+    }
+    .stage-nav-btn.is-done {
+      border-left: 3px solid var(--secondary);
+      color: var(--on-surface);
+    }
+    .stage-nav-btn.is-active {
+      background: var(--surface-container-high);
+      border-color: var(--primary);
+      color: var(--on-surface);
+    }
+
+    /* Stage 1: Aisle Trap */
+    .duel-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-md);
+    }
+    .laptop-card {
+      background: var(--surface-container-low);
+      border: 1px solid var(--outline);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+      transition: border-color var(--dur-short) var(--ease-out),
+                  box-shadow var(--dur-short) var(--ease-out);
+    }
+    .laptop-card.is-clickable {
+      cursor: pointer;
+    }
+    .laptop-card.is-clickable:hover {
+      border-color: var(--secondary);
+      box-shadow: var(--glow-secondary);
+    }
+    .laptop-card.is-intel {
+      border: var(--cyan-border-lit);
+      box-shadow: var(--cyan-inset);
+    }
+    .laptop-card.is-trap {
+      border: var(--neon-border);
+    }
+    .spec-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+      font-size: 0.875rem;
+    }
+    .spec-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-sm);
+      padding-bottom: var(--space-xs);
+      border-bottom: 1px solid var(--outline-variant);
+    }
+
+    .scenario-box {
+      background: var(--surface-container-high);
+      border: var(--neon-border);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+    .verdict-banner {
+      padding: var(--space-md);
+      border-radius: var(--rounded);
+      border: 1px solid var(--outline);
+      background: var(--surface-container-low);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .verdict-banner.is-win {
+      border-color: var(--secondary);
+      box-shadow: var(--cyan-inset);
+    }
+    .verdict-banner.is-fail {
+      border-color: var(--error);
+    }
+
+    /* Stage 2: 3-Engine Architecture Router */
+    .architecture-wrap {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      gap: var(--space-lg);
+      align-items: start;
+    }
+    .die-schematic {
+      background: var(--surface-container-low);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+    .engine-cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-sm);
+    }
+    .engine-slot {
+      background: var(--surface-container);
+      border: 1px solid var(--outline);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      min-height: 44px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+      text-align: left;
+      color: var(--on-surface);
+      transition: border-color var(--dur-short) var(--ease-out),
+                  box-shadow var(--dur-short) var(--ease-out),
+                  background-color var(--dur-short) var(--ease-out);
+    }
+    .engine-slot:hover:not(:disabled) {
+      background: var(--surface-container-high);
+      border-color: var(--secondary);
+      box-shadow: var(--glow-secondary);
+    }
+    .engine-slot.is-cpu:hover:not(:disabled) { border-color: var(--tertiary); box-shadow: var(--glow-tertiary); }
+    .engine-slot.is-gpu:hover:not(:disabled) { border-color: var(--primary); box-shadow: var(--glow-primary); }
+    .engine-slot.is-npu:hover:not(:disabled) { border-color: var(--secondary); box-shadow: var(--glow-secondary); }
+    .engine-slot:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .telemetry-meters {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+    .meter-row {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .meter-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+    }
+
+    /* Stage 3: Offline & Privacy Race */
+    .toggle-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+      gap: var(--space-md);
+    }
+    .race-lanes {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-md);
+    }
+    .lane-card {
+      background: var(--surface-container-low);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+    .lane-card.is-intel-lane {
+      border-color: color-mix(in srgb, var(--secondary) 40%, transparent);
+    }
+
+    /* Stage 4: Competitive Gauntlet + Chart */
+    .chart-wrap {
+      position: relative;
+      min-height: 300px;
+      width: 100%;
+      background: var(--surface-container-low);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-md);
+    }
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+    .compare-table th, .compare-table td {
+      padding: var(--space-sm) var(--space-md);
+      text-align: left;
+      border-bottom: 1px solid var(--outline-variant);
+    }
+    .compare-table th {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--on-surface-variant);
+      background: var(--surface-container-low);
+    }
+    .compare-table tr.is-intel-row {
+      background: var(--surface-container-high);
+      border-left: 3px solid var(--primary);
+    }
+
+    /* Stage 5: Recommender & Store Pass */
+    .slider-panel {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+      gap: var(--space-md);
+    }
+    .input-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .input-field-group label {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--on-surface-variant);
+    }
+    .neon-select, .neon-range {
+      width: 100%;
+      background: var(--surface-container-low);
+      color: var(--on-surface);
+      border: 0;
+      border-bottom: 2px solid var(--primary);
+      border-radius: var(--rounded);
+      padding: var(--space-sm) var(--space-md);
+      min-height: 44px;
+      font-size: var(--body-size);
+    }
+    .neon-select {
+      padding-right: var(--space-xl);
+    }
+    .neon-range {
+      padding: var(--space-xs) 0;
+      accent-color: var(--secondary);
+      border-bottom: none;
+    }
+
+    .pass-card {
+      background: var(--surface-container-high);
+      border: var(--cyan-border-lit);
+      box-shadow: var(--cyan-inset);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+    .checklist-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+      gap: var(--space-sm);
+    }
+    .check-item {
+      background: var(--surface-container-low);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--rounded);
+      padding: var(--space-sm) var(--space-md);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-size: 0.875rem;
+    }
+
+    details.sources-drawer {
+      background: var(--surface-container-low);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-md);
+    }
+    details.sources-drawer summary {
+      cursor: pointer;
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--secondary);
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    details.sources-drawer ul {
+      margin: var(--space-sm) 0 0;
+      padding-left: var(--space-lg);
+      color: var(--on-surface-variant);
+      font-size: 0.875rem;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 960px) {
+      .page-grid {
+        grid-template-columns: 1fr;
+      }
+      .hud-column {
+        order: -1;
+      }
+      .architecture-wrap {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 640px) {
+      .page-grid {
+        grid-template-columns: 1fr;
+        padding: var(--space-md);
+        gap: var(--space-lg);
+      }
+      .duel-grid, .race-lanes, .engine-cards {
+        grid-template-columns: 1fr;
+      }
+      .compare-table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-grid">
+    <!-- MAIN INTERACTIVE GAME COLUMN -->
+    <main class="main-column">
+      <!-- HERO & INSTANT STORE SETUP -->
+      <header class="hero-block">
+        <div class="kicker">
+          <i data-lucide="cpu" width="16" height="16" aria-hidden="true"></i>
+          <span>In-Store Interactive Challenge // 2–3 Min Run</span>
+        </div>
+        <h1>Don't Buy a Pretty Trap. Build Your <span class="cyan-text">Intel AI PC</span>.</h1>
+        <p class="hero-lede">
+          Shiny chassis colors and low sticker prices trick 7 out of 10 walk-in shoppers into laptops that choke on AI, drain battery by 2 PM, and age out fast. Beat 4 quick challenges to unlock your custom Intel Core Ultra store pass.
+        </p>
+
+        <div class="neon-panel is-subtle">
+          <div class="setup-strip">
+            <div class="control-group">
+              <span class="label-mono">1. Where are you shopping?</span>
+              <div class="chip-row" role="group" aria-label="Select retail store">
+                <button type="button" class="chip-btn" id="store-reliance" onclick="selectStore('Reliance Digital')" aria-pressed="true">Reliance Digital</button>
+                <button type="button" class="chip-btn" id="store-croma" onclick="selectStore('Croma')" aria-pressed="false">Croma</button>
+                <button type="button" class="chip-btn" id="store-vijay" onclick="selectStore('Vijay Sales')" aria-pressed="false">Vijay Sales</button>
+              </div>
+            </div>
+            <div class="control-group">
+              <span class="label-mono">2. Pick your daily vibe</span>
+              <div class="chip-row" role="group" aria-label="Select user profile">
+                <button type="button" class="chip-btn is-pink" id="vibe-campus" onclick="selectVibe('campus')" aria-pressed="true">Campus &amp; Coding</button>
+                <button type="button" class="chip-btn is-pink" id="vibe-creator" onclick="selectVibe('creator')" aria-pressed="false">Creator &amp; Reels</button>
+                <button type="button" class="chip-btn is-pink" id="vibe-hustle" onclick="selectVibe('hustle')" aria-pressed="false">Work &amp; Meetings</button>
+                <button type="button" class="chip-btn is-pink" id="vibe-gaming" onclick="selectVibe('gaming')" aria-pressed="false">Gaming &amp; Everyday</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- STAGE 1: THE AISLE TRAP -->
+      <section class="stage-section" id="stage-1" aria-labelledby="stage-1-heading">
+        <div class="stage-header">
+          <div class="stage-title-wrap">
+            <span class="kicker is-pink">Challenge 01 // Everyday Life &amp; Buying Smart</span>
+            <h2 id="stage-1-heading">Spot the Store Aisle Trap</h2>
+          </div>
+          <span class="badge is-yellow" id="stage1-badge">Round 1 of 4</span>
+        </div>
+        <p class="muted">
+          Behavioral studies show rushed shoppers pick flashy extras and cheap upfront prices over the 3 core specs that matter. Test both store display laptops across 4 real college &amp; life moments—tap the machine that actually survives.
+        </p>
+
+        <div class="duel-grid">
+          <button type="button" class="laptop-card is-trap is-clickable" id="pick-trap-btn" onclick="answerTrapRound('trap')" style="text-align: left;">
+            <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+              <span class="badge is-error">Aisle Bait</span>
+              <span class="label-mono">0 NPU TOPS</span>
+            </div>
+            <div>
+              <h3>Neon-Mint "Bargain" Book</h3>
+              <p class="muted" style="font-size:0.875rem; margin-top:4px;">Trendy pastel lid + lowest sticker price on the shelf</p>
+            </div>
+            <ul class="spec-list">
+              <li><span class="muted">Processor</span><span>Legacy 13th Gen (No NPU)</span></li>
+              <li><span class="muted">Memory</span><span>8GB RAM (Budget Cap)</span></li>
+              <li><span class="muted">AI Mode</span><span>Cloud-Only / CPU Fallback</span></li>
+              <li><span class="muted">Battery</span><span>6–10 hrs (Drains on AI)</span></li>
+            </ul>
+          </button>
+
+          <button type="button" class="laptop-card is-intel is-clickable" id="pick-intel-btn" onclick="answerTrapRound('intel')" style="text-align: left;">
+            <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+              <span class="badge is-cyan">Copilot+ Class</span>
+              <span class="label-mono">40–50 NPU TOPS</span>
+            </div>
+            <div>
+              <h3>Intel Core Ultra AI PC</h3>
+              <p class="muted" style="font-size:0.875rem; margin-top:4px;">3-engine silicon built for 2026+ AI &amp; x86 longevity</p>
+            </div>
+            <ul class="spec-list">
+              <li><span class="muted">Processor</span><span>CPU + Arc GPU + Dedicated NPU</span></li>
+              <li><span class="muted">Memory</span><span>16GB–32GB RAM Baseline</span></li>
+              <li><span class="muted">AI Mode</span><span>Local On-Device + Cloud</span></li>
+              <li><span class="muted">Battery</span><span>12–27 hrs Class Endurance</span></li>
+            </ul>
+          </button>
+        </div>
+
+        <div class="scenario-box" id="trap-scenario-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:var(--space-sm);">
+            <span class="kicker" id="trap-round-label">Scenario 1 / 4</span>
+            <span class="label-mono" id="trap-score-readout">0 / 4 Traps Exposed</span>
+          </div>
+          <h3 id="trap-question-title">It's 9 PM on weak hostel Wi-Fi. You need to summarize a 40-page confidential PDF before tomorrow's viva. Which laptop gets it done?</h3>
+          <p class="muted" id="trap-question-hint">Hint: Think about whether your AI needs the cloud or runs locally in 16GB RAM.</p>
+          <div class="verdict-banner" id="trap-verdict-box" style="display:none;">
+            <strong id="trap-verdict-title"></strong>
+            <p id="trap-verdict-detail" class="muted" style="font-size:0.9rem;"></p>
+            <div style="margin-top:var(--space-xs);">
+              <button type="button" class="btn-neon is-cyan" id="trap-next-btn" onclick="nextTrapRound()">Next Scenario</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STAGE 2: 3-ENGINE WORKLOAD ROUTER -->
+      <section class="stage-section" id="stage-2" aria-labelledby="stage-2-heading">
+        <div class="stage-header">
+          <div class="stage-title-wrap">
+            <span class="kicker">Challenge 02 // Work, Study &amp; Silicon Architecture</span>
+            <h2 id="stage-2-heading">Route the Workload: CPU vs. Arc GPU vs. NPU</h2>
+          </div>
+          <span class="badge is-cyan" id="stage2-badge">Task 1 of 5</span>
+        </div>
+        <p class="muted">
+          An Intel Core Ultra AI PC doesn't dump everything onto one chip. It splits tasks across <strong>three specialized compute engines</strong>. Route each Gen Z task to the optimal engine to maximize battery and keep fans silent.
+        </p>
+
+        <div class="neon-panel is-cyan">
+          <div class="architecture-wrap">
+            <div class="die-schematic">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="label-mono">Intel Core Ultra Die Map</span>
+                <span class="badge is-pink" id="router-task-counter">5 Tasks Queued</span>
+              </div>
+
+              <!-- SVG Tri-Engine Diagram -->
+              <svg viewBox="0 0 460 150" width="100%" height="150" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect x="8" y="8" width="444" height="134" rx="4" fill="var(--background)" stroke="var(--outline-variant)" stroke-width="1.5"/>
+                <!-- CPU Block -->
+                <rect id="svg-cpu-box" x="22" y="24" width="128" height="102" rx="3" fill="var(--surface-container)" stroke="var(--tertiary)" stroke-width="1.5"/>
+                <text x="86" y="54" text-anchor="middle" fill="var(--tertiary)" font-family="Space Mono, monospace" font-size="11" font-weight="700">CPU</text>
+                <text x="86" y="74" text-anchor="middle" fill="var(--on-surface)" font-family="Inter, sans-serif" font-size="10">P + E + LPE Cores</text>
+                <text x="86" y="92" text-anchor="middle" fill="var(--on-surface-variant)" font-family="Space Mono, monospace" font-size="9">FAST RESPONSE</text>
+                <text x="86" y="108" text-anchor="middle" fill="var(--on-surface-variant)" font-family="Space Mono, monospace" font-size="9">LOW LATENCY</text>
+
+                <!-- GPU Block -->
+                <rect id="svg-gpu-box" x="166" y="24" width="128" height="102" rx="3" fill="var(--surface-container)" stroke="var(--primary)" stroke-width="1.5"/>
+                <text x="230" y="54" text-anchor="middle" fill="var(--primary)" font-family="Space Mono, monospace" font-size="11" font-weight="700">INTEL ARC GPU</text>
+                <text x="230" y="74" text-anchor="middle" fill="var(--on-surface)" font-family="Inter, sans-serif" font-size="10">Xe / Xe3 Cores</text>
+                <text x="230" y="92" text-anchor="middle" fill="var(--on-surface-variant)" font-family="Space Mono, monospace" font-size="9">HIGH THROUGHPUT</text>
+                <text x="230" y="108" text-anchor="middle" fill="var(--on-surface-variant)" font-family="Space Mono, monospace" font-size="9">VISUAL &amp; RENDER</text>
+
+                <!-- NPU Block -->
+                <rect id="svg-npu-box" x="310" y="24" width="128" height="102" rx="3" fill="var(--surface-container)" stroke="var(--secondary)" stroke-width="1.5"/>
+                <text x="374" y="54" text-anchor="middle" fill="var(--secondary)" font-family="Space Mono, monospace" font-size="11" font-weight="700">AI BOOST NPU</text>
+                <text x="374" y="74" text-anchor="middle" fill="var(--on-surface)" font-family="Inter, sans-serif" font-size="10">40–50 TOPS</text>
+                <text x="374" y="92" text-anchor="middle" fill="var(--on-surface-variant)" font-family="Space Mono, monospace" font-size="9">SUSTAINED AI</text>
+                <text x="374" y="108" text-anchor="middle" fill="var(--on-surface-variant)" font-family="Space Mono, monospace" font-size="9">2.56x PERF/WATT</text>
+              </svg>
+
+              <div class="scenario-box" style="padding:var(--space-md);">
+                <span class="kicker is-yellow" id="router-task-category">Incoming Workload</span>
+                <h3 id="router-task-title">2-Hour Study Group Call (Zoom/Teams): Background Blur + Eye Contact + Live Translation Captions</h3>
+                <p class="muted" id="router-task-desc" style="font-size:0.875rem;">This AI runs continuously in the background for hours. Which engine handles sustained AI without killing your battery?</p>
+              </div>
+
+              <div class="engine-cards">
+                <button type="button" class="engine-slot is-cpu" id="route-cpu-btn" onclick="routeTask('cpu')">
+                  <span class="label-mono yellow-text">Assign CPU</span>
+                  <strong style="font-size:0.95rem;">Fast Response</strong>
+                  <span class="muted" style="font-size:0.8rem;">Sudden spikes &amp; snappy OS logic</span>
+                </button>
+                <button type="button" class="engine-slot is-gpu" id="route-gpu-btn" onclick="routeTask('gpu')">
+                  <span class="label-mono neon-text">Assign Arc GPU</span>
+                  <strong style="font-size:0.95rem;">High Throughput</strong>
+                  <span class="muted" style="font-size:0.8rem;">Parallel pixels, Adobe &amp; gaming</span>
+                </button>
+                <button type="button" class="engine-slot is-npu" id="route-npu-btn" onclick="routeTask('npu')">
+                  <span class="label-mono cyan-text">Assign NPU</span>
+                  <strong style="font-size:0.95rem;">Power Efficiency</strong>
+                  <span class="muted" style="font-size:0.8rem;">Always-on AI &amp; Copilot+</span>
+                </button>
+              </div>
+
+              <div class="verdict-banner" id="router-feedback-box" style="display:none;">
+                <strong id="router-feedback-title"></strong>
+                <p id="router-feedback-detail" class="muted" style="font-size:0.875rem;"></p>
+                <div style="margin-top:var(--space-xs);">
+                  <button type="button" class="btn-neon is-cyan" id="router-next-btn" onclick="nextRouterTask()">Next Workload</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Live Silicon Telemetry -->
+            <div class="neon-panel is-subtle">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-md);">
+                <span class="label-mono">Live Silicon Telemetry</span>
+                <span class="badge is-cyan" id="router-efficiency-grade">Optimal</span>
+              </div>
+              <div class="telemetry-meters">
+                <div class="meter-row">
+                  <div class="meter-head">
+                    <span>Battery Endurance</span>
+                    <span class="cyan-text" id="tel-battery-val">92%</span>
+                  </div>
+                  <div class="progress-track">
+                    <div class="progress-fill" id="tel-battery-bar" style="width:92%;"></div>
+                  </div>
+                </div>
+                <div class="meter-row">
+                  <div class="meter-head">
+                    <span>Thermal &amp; Fan Quietness</span>
+                    <span class="cyan-text" id="tel-quiet-val">95%</span>
+                  </div>
+                  <div class="progress-track">
+                    <div class="progress-fill" id="tel-quiet-bar" style="width:95%;"></div>
+                  </div>
+                </div>
+                <div class="meter-row">
+                  <div class="meter-head">
+                    <span>AI Throughput Speed</span>
+                    <span class="neon-text" id="tel-speed-val">88%</span>
+                  </div>
+                  <div class="progress-track">
+                    <div class="progress-fill is-pink" id="tel-speed-bar" style="width:88%;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top:var(--space-lg); padding-top:var(--space-md); border-top:1px solid var(--outline-variant); display:flex; flex-direction:column; gap:var(--space-xs);">
+                <span class="label-mono">Why This Matters in Real Life</span>
+                <p class="muted" style="font-size:0.85rem;">
+                  Traditional laptops run video-call effects and local AI on the CPU or GPU, spinning fans and burning battery. Intel's NPU offloads those sustained neural tasks at a fraction of the watts—while Intel Arc GPU and P/E/LPE CPU cores stay free for creative bursts and instant clicks.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STAGE 3: PRIVACY & OFFLINE SHOWDOWN -->
+      <section class="stage-section" id="stage-3" aria-labelledby="stage-3-heading">
+        <div class="stage-header">
+          <div class="stage-title-wrap">
+            <span class="kicker is-pink">Challenge 03 // Creativity, OpenVINO &amp; On-Device Privacy</span>
+            <h2 id="stage-3-heading">The Wi-Fi Deadzone &amp; Privacy Vault Test</h2>
+          </div>
+          <span class="badge is-cyan" id="stage3-badge">Ready to Test</span>
+        </div>
+        <p class="muted">
+          Flip the conditions below and run a live creative &amp; study workload. Watch what happens when a cloud-dependent regular laptop meets a deadzone or a confidential document versus an Intel Core Ultra AI PC running locally with OpenVINO and Copilot+.
+        </p>
+
+        <div class="neon-panel">
+          <div class="toggle-bar" style="margin-bottom:var(--space-md);">
+            <div class="control-group">
+              <span class="label-mono">Network Environment</span>
+              <div class="chip-row">
+                <button type="button" class="chip-btn" id="net-online" onclick="setNetworkMode('online')" aria-pressed="true">Fast Store Wi-Fi</button>
+                <button type="button" class="chip-btn is-pink" id="net-offline" onclick="setNetworkMode('offline')" aria-pressed="false">Deadzone / Flight Mode</button>
+              </div>
+            </div>
+            <div class="control-group">
+              <span class="label-mono">Creative / Study Workload</span>
+              <div class="chip-row">
+                <button type="button" class="chip-btn" id="work-adobe" onclick="setPrivacyTask('adobe')" aria-pressed="true">Adobe Neural Edit</button>
+                <button type="button" class="chip-btn" id="work-pdf" onclick="setPrivacyTask('pdf')" aria-pressed="false">Confidential PDF</button>
+                <button type="button" class="chip-btn" id="work-captions" onclick="setPrivacyTask('captions')" aria-pressed="false">Live Captions</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:var(--space-md); margin-bottom:var(--space-md);">
+            <p class="muted" id="privacy-task-summary" style="font-size:0.9rem;">
+              Task: Retouching personal photos &amp; removing backgrounds locally with Adobe + Intel AI acceleration.
+            </p>
+            <button type="button" class="btn-neon" id="run-privacy-race-btn" onclick="runPrivacySimulation()">
+              <i data-lucide="play" width="16" height="16" aria-hidden="true"></i>
+              <span>Run Live Simulation</span>
+            </button>
+          </div>
+
+          <div class="race-lanes">
+            <div class="lane-card">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>Cloud-Only Traditional PC</strong>
+                <span class="badge is-error" id="cloud-status-badge">Standby</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill is-pink" id="cloud-progress-bar" style="width:0%;"></div>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:0.82rem;" class="label-mono">
+                <span id="cloud-data-stat">Data Uploaded: 0 MB</span>
+                <span id="cloud-time-stat">Latency: --</span>
+              </div>
+              <p class="muted" id="cloud-outcome-note" style="font-size:0.85rem;">Waiting for simulation run.</p>
+            </div>
+
+            <div class="lane-card is-intel-lane">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>Intel Core Ultra (Local NPU + OpenVINO)</strong>
+                <span class="badge is-cyan" id="local-status-badge">Standby</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" id="local-progress-bar" style="width:0%;"></div>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:0.82rem;" class="label-mono">
+                <span id="local-data-stat">Data Uploaded: 0 KB (Private)</span>
+                <span id="local-time-stat">Latency: --</span>
+              </div>
+              <p class="muted" id="local-outcome-note" style="font-size:0.85rem;">Waiting for simulation run.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STAGE 4: COMPETITIVE SUPERIORITY GAUNTLET -->
+      <section class="stage-section" id="stage-4" aria-labelledby="stage-4-heading">
+        <div class="stage-header">
+          <div class="stage-title-wrap">
+            <span class="kicker is-yellow">Challenge 04 // Competitive Reality Check</span>
+            <h2 id="stage-4-heading">Intel Core Ultra vs. Legacy, ARM &amp; Rival Chips</h2>
+          </div>
+          <span class="badge is-cyan" id="stage4-badge">Benchmark Explorer</span>
+        </div>
+        <p class="muted">
+          Not all "AI PCs" are built equal. Switch between real Gen Z workloads below to compare Intel Core Ultra (Series 2 &amp; Series 3) against traditional non-NPU laptops, ARM-based Qualcomm Snapdragon PCs, and AMD Ryzen AI systems.
+        </p>
+
+        <div class="neon-panel is-cyan">
+          <div class="control-group" style="margin-bottom:var(--space-md);">
+            <span class="label-mono">Select Stress-Test Workload</span>
+            <div class="chip-row">
+              <button type="button" class="chip-btn" id="bench-compat" onclick="selectBenchmark('compat')" aria-pressed="true">Engineering &amp; Legacy x86 Apps</button>
+              <button type="button" class="chip-btn" id="bench-ai" onclick="selectBenchmark('ai')" aria-pressed="false">Copilot+ &amp; Creator AI</button>
+              <button type="button" class="chip-btn" id="bench-battery" onclick="selectBenchmark('battery')" aria-pressed="false">Campus Battery &amp; Quiet</button>
+              <button type="button" class="chip-btn" id="bench-gaming" onclick="selectBenchmark('gaming')" aria-pressed="false">Gaming &amp; Graphics</button>
+            </div>
+          </div>
+
+          <div class="chart-wrap" style="min-height:290px;">
+            <canvas id="comparison-chart" aria-label="AI PC platform comparison chart"></canvas>
+          </div>
+
+          <div class="verdict-banner is-win" id="bench-insight-box" style="margin-top:var(--space-md);">
+            <strong id="bench-insight-title">Zero Emulation Tax: Why x86 Beats ARM Buyer's Remorse</strong>
+            <p id="bench-insight-text" class="muted" style="font-size:0.9rem;">
+              ARM laptops (Snapdragon X / X2) rely on Microsoft's Prism emulation layer for traditional Windows apps—where niche college engineering software, drivers, VPNs, and some games can stumble or slow down. Intel Core Ultra runs native x86 cleanly with zero emulation headaches.
+            </p>
+          </div>
+
+          <div style="margin-top:var(--space-md); overflow-x:auto;">
+            <table class="compare-table">
+              <thead>
+                <tr>
+                  <th>Platform (2026 Class)</th>
+                  <th>NPU Speed</th>
+                  <th>App Compatibility</th>
+                  <th>Key Advantage / Trade-Off</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="is-intel-row">
+                  <td><strong>Intel Core Ultra (Series 2 / Series 3)</strong></td>
+                  <td class="cyan-text">40–50 NPU TOPS (up to 180 Platform)</td>
+                  <td>100% Native x86</td>
+                  <td>Copilot+ certified, 12–27 hr battery pitch, deep Adobe/Teams/OpenVINO support</td>
+                </tr>
+                <tr>
+                  <td>AMD Ryzen AI (300 / 400 Series)</td>
+                  <td>50–60 NPU TOPS</td>
+                  <td>Native x86</td>
+                  <td>Clears 40-TOPS bar; practical Windows AI parity, trails Series 2/3 ultrathin efficiency &amp; ISV ecosystem</td>
+                </tr>
+                <tr>
+                  <td>Qualcomm Snapdragon X / X2 (ARM)</td>
+                  <td>45–80 NPU TOPS</td>
+                  <td class="yellow-text">ARM + Prism Emulation</td>
+                  <td>Strong battery &amp; high NPU spec, but legacy software, drivers, VPNs &amp; some games risk emulation bugs</td>
+                </tr>
+                <tr>
+                  <td>Regular Non-NPU Laptop (13th Gen Core)</td>
+                  <td class="neon-text">0 TOPS (No NPU)</td>
+                  <td>Native x86</td>
+                  <td>Lowest upfront price; AI falls back to CPU/GPU, drains battery, no Copilot+ features</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="neon-panel is-subtle" style="margin-top:var(--space-md); padding:var(--space-md);">
+            <span class="label-mono yellow-text">Honest Spec Check (No Marketing Fluff)</span>
+            <p class="muted" style="font-size:0.85rem; margin-top:var(--space-xs);">
+              Microsoft requires <strong>40+ NPU TOPS</strong> for Copilot+ features (Recall, Cocreator, Live Captions). Combined "Platform TOPS" (like 120 or 180) adds CPU + GPU + NPU together—check the dedicated NPU figure and ensure at least <strong>16GB RAM</strong>. If you only play heavy 3D AAA games, pair Intel Core Ultra with a discrete GPU.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- STAGE 5: PERSONALIZED AI PC MATCH & IN-STORE PASS -->
+      <section class="stage-section" id="stage-5" aria-labelledby="stage-5-heading">
+        <div class="stage-header">
+          <div class="stage-title-wrap">
+            <span class="kicker is-pink">Final Step // Your Store Aisle Action Plan</span>
+            <h2 id="stage-5-heading">Your Personalized Intel AI PC Pass</h2>
+          </div>
+          <span class="badge is-cyan" id="stage5-badge">Ready at Checkout</span>
+        </div>
+
+        <div class="neon-panel">
+          <div class="slider-panel" style="margin-bottom:var(--space-lg);">
+            <div class="input-field-group">
+              <label for="budget-select">Your Budget &amp; Performance Tier</label>
+              <select id="budget-select" class="neon-select" onchange="updateRecommendation()">
+                <option value="entry">Smart Student / Office Value (Entry NPU ~12 TOPS)</option>
+                <option value="mainstream" selected>Mainstream Copilot+ Ultrathin (40+ TOPS, Series 2 200V)</option>
+                <option value="flagship">Pro Creator &amp; Power User (50 NPU TOPS, Series 3 300)</option>
+              </select>
+            </div>
+            <div class="input-field-group">
+              <label for="battery-priority">Daily Unplugged Hours Needed: <span class="cyan-text" id="battery-hours-label">14 hrs</span></label>
+              <input type="range" id="battery-priority" class="neon-range" min="6" max="24" step="2" value="14" oninput="syncBatteryPriority(this.value)">
+            </div>
+          </div>
+
+          <div class="pass-card" id="store-pass-card">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:var(--space-sm);">
+              <div>
+                <span class="kicker" id="pass-store-label">RELIANCE DIGITAL // INSTORE PASS</span>
+                <h3 id="pass-model-title" style="font-size:1.45rem; margin-top:4px;">Intel Core Ultra Series 2 (200V) — Copilot+ Ultrathin</h3>
+              </div>
+              <span class="badge is-cyan" id="pass-tops-badge">40+ NPU TOPS // x86 NATIVE</span>
+            </div>
+
+            <p id="pass-why-text" class="muted">
+              Tailored for your Campus &amp; Coding vibe: clears Microsoft's 40+ NPU TOPS bar for local Copilot+ AI, delivers standout unplugged efficiency, and runs every Windows app natively on x86 without ARM emulation surprises.
+            </p>
+
+            <div class="checklist-grid">
+              <div class="check-item">
+                <i data-lucide="check-circle-2" width="18" height="18" style="color:var(--secondary); flex-shrink:0;" aria-hidden="true"></i>
+                <span><strong>CPU/NPU:</strong> <span id="check-chip-spec">Core Ultra 5/7 200V</span></span>
+              </div>
+              <div class="check-item">
+                <i data-lucide="check-circle-2" width="18" height="18" style="color:var(--secondary); flex-shrink:0;" aria-hidden="true"></i>
+                <span><strong>RAM:</strong> <span id="check-ram-spec">16GB+ (32GB for Creators)</span></span>
+              </div>
+              <div class="check-item">
+                <i data-lucide="check-circle-2" width="18" height="18" style="color:var(--secondary); flex-shrink:0;" aria-hidden="true"></i>
+                <span><strong>Graphics:</strong> <span id="check-gpu-spec">Intel Arc Graphics</span></span>
+              </div>
+              <div class="check-item">
+                <i data-lucide="check-circle-2" width="18" height="18" style="color:var(--secondary); flex-shrink:0;" aria-hidden="true"></i>
+                <span><strong>Check Sticker:</strong> <span id="check-sticker-spec">Copilot+ &amp; Intel Core Ultra</span></span>
+              </div>
+            </div>
+
+            <div style="display:flex; flex-wrap:wrap; gap:var(--space-sm); align-items:center; padding-top:var(--space-sm); border-top:1px solid var(--outline-variant);">
+              <button type="button" class="btn-neon is-cyan" onclick="downloadStorePass()">
+                <i data-lucide="download" width="16" height="16" aria-hidden="true"></i>
+                <span>Download Store Spec Pass</span>
+              </button>
+              <button type="button" class="btn-neon" onclick="copyAdvisorPitch()">
+                <i data-lucide="copy" width="16" height="16" aria-hidden="true"></i>
+                <span id="copy-pitch-label">Copy Store Advisor Ask</span>
+              </button>
+              <button type="button" class="btn-neon is-ghost" id="reset-quest-btn" onclick="resetQuest(this)">Reset Run</button>
+            </div>
+            <p id="action-status-msg" class="label-mono cyan-text" style="min-height:1.2em;"></p>
+          </div>
+        </div>
+
+        <details class="sources-drawer">
+          <summary>
+            <i data-lucide="book-open" width="16" height="16" aria-hidden="true"></i>
+            <span>Sources &amp; Technical Grounding</span>
+          </summary>
+          <ul>
+            <li><strong>Intel Core Ultra Documentation:</strong> 3-engine heterogeneous architecture (CPU P/E/LPE cores, Intel Arc GPU, Intel AI Boost NPU), OpenVINO Toolkit, and up to 2.56x AI Performance/Watt NPU efficiency.</li>
+            <li><strong>2026 Platform Benchmarks &amp; Copilot+ Standards:</strong> Microsoft 40+ NPU TOPS baseline, Intel Core Ultra Series 2 (200V, up to 120 platform TOPS) &amp; Series 3 (Panther Lake on Intel 18A, 50 NPU TOPS / up to 180 platform TOPS), vs. AMD Ryzen AI (50–60 TOPS) and Qualcomm Snapdragon X/X2 ARM Prism emulation trade-offs.</li>
+            <li><strong>HP Tech Takes &amp; Odrr Office Guides:</strong> 16GB baseline / 32GB creator RAM requirements for local LLMs, and entry NPU (10–15 TOPS like Core Ultra 5 225U at 12 TOPS) vs. Copilot+ class (40+ TOPS).</li>
+            <li><strong>Behavioral Decision Science:</strong> Insights on feature-count traps under time pressure and price-vs-quality framing drawn from Robert Cialdini's <em>Pre-Suasion</em> and <em>Influence</em>.</li>
+          </ul>
+        </details>
+      </section>
+    </main>
+
+    <!-- LIVE HUD RAIL -->
+    <section class="hud-column" aria-label="Live Player HUD">
+      <div class="neon-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-md);">
+          <span class="kicker">Player HUD</span>
+          <span class="badge is-pink" id="hud-store-pill">Reliance Digital</span>
+        </div>
+
+        <div class="hud-grid-metrics">
+          <div class="metric-tile">
+            <span class="label-mono">Quest XP</span>
+            <span class="metric-val neon-text" id="hud-xp">0</span>
+          </div>
+          <div class="metric-tile">
+            <span class="label-mono">AI IQ Level</span>
+            <span class="metric-val cyan-text" id="hud-rank">Rookie</span>
+          </div>
+        </div>
+
+        <div style="margin-top:var(--space-md); display:flex; flex-direction:column; gap:var(--space-xs);">
+          <div style="display:flex; justify-content:space-between;" class="label-mono">
+            <span>Quest Progress</span>
+            <span id="hud-progress-pct">0%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="hud-progress-bar" style="width:0%;"></div>
+          </div>
+        </div>
+
+        <div style="margin-top:var(--space-lg); display:flex; flex-direction:column; gap:var(--space-sm);">
+          <span class="label-mono">Mission Stages</span>
+          <div class="stage-nav-list">
+            <button type="button" class="stage-nav-btn is-active" id="nav-stage-1" onclick="jumpToStage('stage-1')">
+              <span>01 // Spot the Trap</span>
+              <span id="nav-status-1">Play</span>
+            </button>
+            <button type="button" class="stage-nav-btn" id="nav-stage-2" onclick="jumpToStage('stage-2')">
+              <span>02 // Tri-Engine Router</span>
+              <span id="nav-status-2">Play</span>
+            </button>
+            <button type="button" class="stage-nav-btn" id="nav-stage-3" onclick="jumpToStage('stage-3')">
+              <span>03 // Privacy &amp; Offline</span>
+              <span id="nav-status-3">Play</span>
+            </button>
+            <button type="button" class="stage-nav-btn" id="nav-stage-4" onclick="jumpToStage('stage-4')">
+              <span>04 // x86 vs. Rivals</span>
+              <span id="nav-status-4">Explore</span>
+            </button>
+            <button type="button" class="stage-nav-btn" id="nav-stage-5" onclick="jumpToStage('stage-5')">
+              <span>05 // Store AI PC Pass</span>
+              <span id="nav-status-5">Ready</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="neon-panel is-cyan">
+        <span class="kicker">Unlocked Intel Badges</span>
+        <div class="chip-row" id="badges-rack" style="margin-top:var(--space-sm);">
+          <span class="badge" id="badge-trap">Trap Spotter</span>
+          <span class="badge" id="badge-silicon">Tri-Engine Pro</span>
+          <span class="badge" id="badge-privacy">Zero-Cloud Vault</span>
+          <span class="badge" id="badge-x86">x86 Strategist</span>
+        </div>
+        <p class="muted" style="font-size:0.82rem; margin-top:var(--space-sm);" id="hud-tip-text">
+          Complete Challenges 01–04 to verify your AI PC specs before talking to a store advisor.
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <api-shim></api-shim>
+
+  <script>
+    /* --- DATA TABLES (Backtick template literals for apostrophe safety) --- */
+    const TRAP_ROUNDS = [
+      {
+        title: `It's 9 PM on weak hostel Wi-Fi. You need to summarize a 40-page confidential PDF before tomorrow's viva. Which laptop gets it done?`,
+        hint: `Hint: Think about whether your AI needs the cloud or runs locally in 16GB RAM.`,
+        winner: `intel`,
+        winTitle: `Correct! +150 XP — Local AI Needs 16GB RAM + Dedicated NPU`,
+        winDetail: `High-TOPS NPUs with 16GB+ RAM let Intel Core Ultra summarize confidential PDFs offline without uploading private data. The 8GB non-NPU bargain unit relies on cloud chat and chokes offline.`,
+        failTitle: `Caught in the Aisle Trap!`,
+        failDetail: `The pastel bargain laptop has 0 NPU TOPS and only 8GB RAM. Without steady Wi-Fi, cloud AI stalls—and running local models on 8GB/CPU crawls.`
+      },
+      {
+        title: `You join a 2-hour internship Teams call from a noisy café with messy lighting. Which laptop keeps your video sharp without dying at 30%?`,
+        hint: `Hint: Background blur, lighting fix, and noise cancellation are "always-on" AI workloads.`,
+        winner: `intel`,
+        winTitle: `Correct! +150 XP — NPU Offloads Always-On Meeting AI`,
+        winDetail: `Windows Studio Effects, noise suppression, and live captions run on the Intel NPU at ultra-low power, preserving battery and keeping fans silent.`,
+        failTitle: `Battery Drain Alert!`,
+        failDetail: `On a non-NPU laptop, camera background blur and noise removal fall back to the CPU/GPU—spinning up fans and burning battery fast.`
+      },
+      {
+        title: `Both laptops look sleek on the shelf, and Laptop A throws in 8 cosmetic extras (free sleeve, color lid, stickers). Which lasts 4 years of college?`,
+        hint: `Hint: Don't trade core compute architecture for surface perks.`,
+        winner: `intel`,
+        winTitle: `Correct! +150 XP — You Beat the Feature-Noise Illusion`,
+        winDetail: `In retail psychology, rushed buyers overvalue minor extras over core capability. An Intel Core Ultra AI PC is built for upcoming on-device AI apps over the next 3–5 years.`,
+        failTitle: `Looked Past the Core!`,
+        failDetail: `Fancy colors fade in a week, but lacking an NPU locks you out of Copilot+ and on-device AI features rolling out across Windows and creator apps.`
+      },
+      {
+        title: `You need to run specialized college coding tools, campus VPNs, and Windows PC games alongside AI study assistants. Which choice avoids software surprises?`,
+        hint: `Hint: Architecture and native software support decide daily reliability.`,
+        winner: `intel`,
+        winTitle: `Correct! +150 XP — Native x86 + AI Acceleration`,
+        winDetail: `Intel Core Ultra delivers 40–50 NPU TOPS on native x86—meaning zero app compatibility guesswork and smooth multitasking across CPU, Arc GPU, and NPU.`,
+        failTitle: `Short-Term Savings, Long-Term Friction!`,
+        failDetail: `Saving upfront on an older 8GB non-NPU machine leaves you lagging behind as apps shift workloads onto dedicated NPUs.`
+      }
+    ];
+
+    const ROUTER_TASKS = [
+      {
+        category: `Work & Study // Sustained Background AI`,
+        title: `2-Hour Zoom / Teams Class: Background Blur + Noise Cancellation + Live Captions`,
+        desc: `Continuous neural processing running for hours. Which engine gives maximum battery endurance and silent fans?`,
+        best: `npu`,
+        feedback: {
+          npu: { ok: true, title: `Optimal Routing! +150 XP — Assigned to Intel AI Boost NPU`, detail: `The NPU handles sustained background AI at up to 2.56x AI performance per watt vs. prior gen—keeping battery flat and fans silent.` },
+          cpu: { ok: false, title: `Sub-Optimal: CPU Overload`, detail: `Running continuous camera & caption AI on CPU spikes power draw and steals responsiveness from your browser and notes. Try routing sustained AI to the NPU!` },
+          gpu: { ok: false, title: `Sub-Optimal: GPU Overkill`, detail: `Firing up the GPU for 2 hours of webcam blur wastes battery and heats up the chassis. The NPU is built for low-power sustained AI.` }
+        }
+      },
+      {
+        category: `Creativity // Parallel Visual Throughput`,
+        title: `Adobe Photoshop Generative Fill + 4K Reel Color Grade`,
+        desc: `Heavy parallel pixel math and creative visual rendering. Which engine unleashes top throughput?`,
+        best: `gpu`,
+        feedback: {
+          gpu: { ok: true, title: `Optimal Routing! +150 XP — Assigned to Integrated Intel Arc GPU`, detail: `Intel Arc Xe-cores deliver high parallel throughput (up to 1.81x graphics lift vs. 13th Gen), accelerating Adobe creative workflows cleanly.` },
+          cpu: { ok: false, title: `Bottleneck Warning!`, detail: `Pushing heavy pixel/matrix rendering onto CPU cores slows exports. The Intel Arc GPU is built for high-throughput parallel media.` },
+          npu: { ok: false, title: `Wrong Engine for Heavy Pixels`, detail: `The NPU excels at low-power sustained AI, whereas heavy parallel rendering and 4K visual throughput belong on the Intel Arc GPU.` }
+        }
+      },
+      {
+        category: `Everyday Speed // Instant Latency`,
+        title: `Instant App Launch, Tab Switching & Sudden Code Compile`,
+        desc: `Sharp, single-threaded bursts where every millisecond of UI responsiveness counts. Which engine takes lead?`,
+        best: `cpu`,
+        feedback: {
+          cpu: { ok: true, title: `Optimal Routing! +150 XP — Assigned to Hybrid CPU (P+E+LPE Cores)`, detail: `Intel Thread Director dispatches sudden low-latency work to Performance cores while background OS chores stay on E/LPE cores.` },
+          gpu: { ok: false, title: `Latency Mismatch`, detail: `GPUs thrive on massive parallel batches, not rapid branching app logic. Let the CPU handle instant low-latency response.` },
+          npu: { ok: false, title: `Not an AI Matrix Task`, detail: `General computing and instant app launches are the CPU's home turf—leaving the NPU free for AI.` }
+        }
+      },
+      {
+        category: `Security & Productivity // Always-On Shield`,
+        title: `Real-Time AI Threat Detection + Local Email Priority Briefing`,
+        desc: `Always-on background cybersecurity monitoring without slowing down your foreground work. Where should it live?`,
+        best: `npu`,
+        feedback: {
+          npu: { ok: true, title: `Optimal Routing! +150 XP — Assigned to Dedicated NPU`, detail: `Intel AI PCs run local security & threat-explanation models on the NPU continuously—protecting data with minimal battery impact.` },
+          cpu: { ok: false, title: `Background Drag!`, detail: `Continuous scanning on CPU competes with your active apps. Offloading to the NPU keeps foreground speed untouched.` },
+          gpu: { ok: false, title: `Unnecessary Wattage`, detail: `Waking the GPU for background security scanning drains battery. NPU wins for quiet, always-on protection.` }
+        }
+      },
+      {
+        category: `Gaming & Stream // Frame Boost`,
+        title: `Esports Match + Frame Rendering at High FPS`,
+        desc: `Needs high graphics throughput and smooth frame pacing. Which engine drives the visuals?`,
+        best: `gpu`,
+        feedback: {
+          gpu: { ok: true, title: `Optimal Routing! +150 XP — Assigned to Intel Arc GPU`, detail: `Intel Arc Graphics brings entry discrete-class capability into sleek AI laptops—while NPU handles stream mic/cam cleanup in parallel!` },
+          cpu: { ok: false, title: `Frame Drop Risk`, detail: `Software rendering on CPU can't match dedicated Xe graphics cores. Route visuals to Intel Arc GPU.` },
+          npu: { ok: false, title: `NPU Isn't a Rasterizer`, detail: `The NPU accelerates AI effects, but 3D frame rendering belongs to the Intel Arc GPU.` }
+        }
+      }
+    ];
+
+    const PRIVACY_TASKS = {
+      adobe: {
+        summary: `Task: Retouching personal photos & removing backgrounds locally with Adobe + Intel AI acceleration.`,
+        cloudMB: `48.2 MB`,
+        localNoteOnline: `Processed locally via NPU/Arc GPU + OpenVINO in 1.4s. Zero personal photos left your SSD.`,
+        localNoteOffline: `100% Offline Success in 1.4s! Your local NPU + OpenVINO never needed Wi-Fi.`,
+        cloudNoteOnline: `Uploaded 48.2 MB of personal photos to third-party cloud servers. Completed in 4.6s (privacy exposure).`,
+        cloudNoteOffline: `FAILED (0%) — No internet detected. Cloud AI tools cannot process your edit offline.`
+      },
+      pdf: {
+        summary: `Task: Summarizing a confidential 40-page internship NDA & financial report using a local LLM.`,
+        cloudMB: `12.8 MB`,
+        localNoteOnline: `Summarized on-device in 1.8s. Sensitive IP stayed inside your 16GB+ local memory.`,
+        localNoteOffline: `100% Offline Success in 1.8s! Summarized confidential PDF mid-flight with zero cloud upload.`,
+        cloudNoteOnline: `Uploaded confidential PDF text to external LLM server. Completed in 3.9s (IP exposure risk).`,
+        cloudNoteOffline: `FAILED (0%) — Network unavailable. Cannot reach cloud LLM.`
+      },
+      captions: {
+        summary: `Task: Real-time translated Live Captions during a fast-paced recorded lecture.`,
+        cloudMB: `31.5 MB`,
+        localNoteOnline: `Real-time NPU captions in 0.2s latency. Audio stream stayed private on device.`,
+        localNoteOffline: `100% Offline Success! Copilot+ Live Captions translated speech locally with 0 bytes sent.`,
+        cloudNoteOnline: `Streamed audio to cloud server. Lagged 2.4s behind speaker with network jitter.`,
+        cloudNoteOffline: `FAILED (0%) — Cloud transcription unavailable without internet.`
+      }
+    };
+
+    const BENCH_DATA = {
+      compat: {
+        label: `Native Software & Driver Compatibility Score`,
+        scores: [99, 98, 72, 95],
+        title: `Zero Emulation Tax: Why x86 Beats ARM Buyer's Remorse`,
+        text: `ARM laptops (Snapdragon X / X2) run traditional x86 Windows apps through Microsoft's Prism emulation layer—causing specialized college engineering tools, certain PC games, VPNs, and legacy drivers to stumble or slow down. Intel Core Ultra runs native x86 cleanly.`
+      },
+      ai: {
+        label: `Copilot+ & ISV Local AI Ecosystem Score`,
+        scores: [96, 86, 88, 22],
+        title: `40–50 NPU TOPS + Deep ISV Co-Engineering`,
+        text: `Intel Core Ultra Series 2 (200V) and Series 3 (50 NPU TOPS, up to 180 platform TOPS) clear Microsoft's 40-TOPS Copilot+ bar and pair with OpenVINO, Adobe Photoshop, Teams, and Zoom optimizations. Legacy 0-TOPS laptops miss local Copilot+ entirely.`
+      },
+      battery: {
+        label: `Real-World Unplugged Endurance & Efficiency Score`,
+        scores: [94, 84, 95, 48],
+        title: `All-Day Campus & Travel Battery Without Emulation Compromises`,
+        text: `Intel Lunar Lake (200V) and Panther Lake (Series 3 on Intel 18A, pitched up to 27 hrs video streaming) deliver flagship unplugged endurance alongside Snapdragon—while keeping full x86 compatibility.`
+      },
+      gaming: {
+        label: `Integrated Graphics & PC Gaming Readiness Score`,
+        scores: [92, 85, 62, 55],
+        title: `Intel Arc Xe / Xe3 Graphics + Native PC Game Support`,
+        text: `Many PC games and anti-cheat drivers fail or underperform under ARM emulation. Intel Core Ultra's Arc GPU delivers smooth integrated gaming—and for heavy 3D AAA titles, Intel laptops pair cleanly with discrete GPUs.`
+      }
+    };
+
+    /* --- APPLICATION STATE --- */
+    let appState = {
+      store: `Reliance Digital`,
+      vibe: `campus`,
+      xp: 0,
+      trapRound: 0,
+      trapHits: 0,
+      trapDone: false,
+      routerIndex: 0,
+      routerHits: 0,
+      routerDone: false,
+      batteryStat: 92,
+      quietStat: 95,
+      speedStat: 88,
+      netMode: `online`,
+      privacyTask: `adobe`,
+      privacyDone: false,
+      benchMode: `compat`,
+      benchDone: false,
+      budgetTier: `mainstream`,
+      batteryHours: 14,
+      unlockedBadges: {
+        trap: false,
+        silicon: false,
+        privacy: false,
+        x86: false
+      }
+    };
+
+    let comparisonChart = null;
+
+    /* --- STATE PERSISTENCE HELPERS --- */
+    async function saveProgress() {
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.setAppState === 'function') {
+          await window.notebookAppApi.setAppState(appState);
+        }
+      } catch (err) {
+        // Non-blocking fallback
+      }
+    }
+
+    function getCssToken(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+
+    /* --- NAVIGATION & SETUP HANDLERS (Hoisted Functions) --- */
+    function selectStore(storeName) {
+      appState.store = storeName;
+      const storeMap = {
+        'Reliance Digital': 'store-reliance',
+        'Croma': 'store-croma',
+        'Vijay Sales': 'store-vijay'
+      };
+      Object.keys(storeMap).forEach(function (key) {
+        const el = document.getElementById(storeMap[key]);
+        if (el) el.setAttribute('aria-pressed', key === storeName ? 'true' : 'false');
+      });
+      const pill = document.getElementById('hud-store-pill');
+      if (pill) pill.textContent = storeName;
+      const passLabel = document.getElementById('pass-store-label');
+      if (passLabel) passLabel.textContent = storeName.toUpperCase() + ` // IN-STORE PASS`;
+      updateRecommendation();
+      saveProgress();
+    }
+
+    function selectVibe(vibeKey) {
+      appState.vibe = vibeKey;
+      const vibes = ['campus', 'creator', 'hustle', 'gaming'];
+      vibes.forEach(function (v) {
+        const el = document.getElementById('vibe-' + v);
+        if (el) el.setAttribute('aria-pressed', v === vibeKey ? 'true' : 'false');
+      });
+      updateRecommendation();
+      saveProgress();
+    }
+
+    function jumpToStage(stageId) {
+      const target = document.getElementById(stageId);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      for (let i = 1; i <= 5; i++) {
+        const navBtn = document.getElementById('nav-stage-' + i);
+        if (navBtn) {
+          navBtn.classList.toggle('is-active', stageId === 'stage-' + i);
+        }
+      }
+    }
+
+    /* --- STAGE 1: SPOT THE AISLE TRAP --- */
+    function renderTrapRound() {
+      const roundIdx = Math.min(appState.trapRound, TRAP_ROUNDS.length - 1);
+      const data = TRAP_ROUNDS[roundIdx];
+      const badge = document.getElementById('stage1-badge');
+      const roundLabel = document.getElementById('trap-round-label');
+      const scoreReadout = document.getElementById('trap-score-readout');
+      const titleEl = document.getElementById('trap-question-title');
+      const hintEl = document.getElementById('trap-question-hint');
+      const verdictBox = document.getElementById('trap-verdict-box');
+      const trapBtn = document.getElementById('pick-trap-btn');
+      const intelBtn = document.getElementById('pick-intel-btn');
+
+      if (badge) badge.textContent = appState.trapDone ? `4 / 4 Cleared` : `Round ` + (roundIdx + 1) + ` of 4`;
+      if (roundLabel) roundLabel.textContent = `Scenario ` + (roundIdx + 1) + ` / 4`;
+      if (scoreReadout) scoreReadout.textContent = appState.trapHits + ` / 4 Traps Exposed`;
+      if (titleEl) titleEl.textContent = data.title;
+      if (hintEl) hintEl.textContent = data.hint;
+
+      if (appState.trapDone) {
+        if (verdictBox) {
+          verdictBox.style.display = 'flex';
+          verdictBox.className = 'verdict-banner is-win';
+        }
+        const vt = document.getElementById('trap-verdict-title');
+        const vd = document.getElementById('trap-verdict-detail');
+        const nb = document.getElementById('trap-next-btn');
+        if (vt) vt.textContent = `Challenge 01 Complete — You Spotted ` + appState.trapHits + ` / 4 Retail Traps!`;
+        if (vd) vd.textContent = `You didn't fall for shiny colors or 8GB budget bait. Scroll to Challenge 02 to master Intel's 3-engine chip architecture.`;
+        if (nb) {
+          nb.textContent = `Go to Challenge 02`;
+          nb.onclick = function () { jumpToStage('stage-2'); };
+        }
+        if (trapBtn) trapBtn.disabled = true;
+        if (intelBtn) intelBtn.disabled = true;
+      } else {
+        if (verdictBox) verdictBox.style.display = 'none';
+        if (trapBtn) trapBtn.disabled = false;
+        if (intelBtn) intelBtn.disabled = false;
+      }
+    }
+
+    function answerTrapRound(choice) {
+      if (appState.trapDone) return;
+      const roundIdx = appState.trapRound;
+      const data = TRAP_ROUNDS[roundIdx];
+      const isWin = choice === data.winner;
+      const verdictBox = document.getElementById('trap-verdict-box');
+      const vt = document.getElementById('trap-verdict-title');
+      const vd = document.getElementById('trap-verdict-detail');
+      const nb = document.getElementById('trap-next-btn');
+      const trapBtn = document.getElementById('pick-trap-btn');
+      const intelBtn = document.getElementById('pick-intel-btn');
+
+      if (trapBtn) trapBtn.disabled = true;
+      if (intelBtn) intelBtn.disabled = true;
+
+      if (isWin) {
+        appState.xp += 150;
+        appState.trapHits += 1;
+        if (verdictBox) verdictBox.className = 'verdict-banner is-win';
+        if (vt) vt.textContent = data.winTitle;
+        if (vd) vd.textContent = data.winDetail;
+      } else {
+        appState.xp += 40;
+        if (verdictBox) verdictBox.className = 'verdict-banner is-fail';
+        if (vt) vt.textContent = data.failTitle;
+        if (vd) vd.textContent = data.failDetail;
+      }
+
+      if (verdictBox) verdictBox.style.display = 'flex';
+      if (nb) {
+        nb.textContent = roundIdx >= TRAP_ROUNDS.length - 1 ? `Finish Challenge 01` : `Next Scenario`;
+        nb.onclick = nextTrapRound;
+      }
+
+      const scoreReadout = document.getElementById('trap-score-readout');
+      if (scoreReadout) scoreReadout.textContent = appState.trapHits + ` / 4 Traps Exposed`;
+      updateHud();
+      saveProgress();
+    }
+
+    function nextTrapRound() {
+      if (appState.trapRound < TRAP_ROUNDS.length - 1) {
+        appState.trapRound += 1;
+      } else {
+        appState.trapDone = true;
+        appState.unlockedBadges.trap = true;
+      }
+      renderTrapRound();
+      updateHud();
+      saveProgress();
+    }
+
+    /* --- STAGE 2: 3-ENGINE WORKLOAD ROUTER --- */
+    function renderRouterTask() {
+      const idx = Math.min(appState.routerIndex, ROUTER_TASKS.length - 1);
+      const task = ROUTER_TASKS[idx];
+      const badge = document.getElementById('stage2-badge');
+      const counter = document.getElementById('router-task-counter');
+      const catEl = document.getElementById('router-task-category');
+      const titleEl = document.getElementById('router-task-title');
+      const descEl = document.getElementById('router-task-desc');
+      const fbBox = document.getElementById('router-feedback-box');
+
+      if (badge) badge.textContent = appState.routerDone ? `5 / 5 Routed` : `Task ` + (idx + 1) + ` of 5`;
+      if (counter) counter.textContent = appState.routerDone ? `All Tasks Routed` : (ROUTER_TASKS.length - idx) + ` Tasks Queued`;
+      if (catEl) catEl.textContent = task.category;
+      if (titleEl) titleEl.textContent = task.title;
+      if (descEl) descEl.textContent = task.desc;
+
+      ['cpu', 'gpu', 'npu'].forEach(function (eng) {
+        const b = document.getElementById('route-' + eng + '-btn');
+        if (b) b.disabled = appState.routerDone;
+      });
+
+      if (appState.routerDone && fbBox) {
+        fbBox.style.display = 'flex';
+        fbBox.className = 'verdict-banner is-win';
+        const ft = document.getElementById('router-feedback-title');
+        const fd = document.getElementById('router-feedback-detail');
+        const nb = document.getElementById('router-next-btn');
+        if (ft) ft.textContent = `Tri-Engine Mastery Unlocked! (` + appState.routerHits + ` / 5 Optimal)`;
+        if (fd) fd.textContent = `You routed low-latency tasks to CPU, heavy visual bursts to Intel Arc GPU, and sustained AI to the NPU. Next: test offline privacy!`;
+        if (nb) {
+          nb.textContent = `Go to Challenge 03`;
+          nb.onclick = function () { jumpToStage('stage-3'); };
+        }
+      } else if (fbBox) {
+        fbBox.style.display = 'none';
+      }
+      renderTelemetryMeters();
+    }
+
+    function renderTelemetryMeters() {
+      const bVal = document.getElementById('tel-battery-val');
+      const bBar = document.getElementById('tel-battery-bar');
+      const qVal = document.getElementById('tel-quiet-val');
+      const qBar = document.getElementById('tel-quiet-bar');
+      const sVal = document.getElementById('tel-speed-val');
+      const sBar = document.getElementById('tel-speed-bar');
+      const grade = document.getElementById('router-efficiency-grade');
+
+      if (bVal) bVal.textContent = appState.batteryStat + `%`;
+      if (bBar) bBar.style.width = appState.batteryStat + `%`;
+      if (qVal) qVal.textContent = appState.quietStat + `%`;
+      if (qBar) qBar.style.width = appState.quietStat + `%`;
+      if (sVal) sVal.textContent = appState.speedStat + `%`;
+      if (sBar) sBar.style.width = appState.speedStat + `%`;
+      if (grade) {
+        grade.textContent = appState.batteryStat >= 80 ? `Optimal` : `High Wattage`;
+        grade.className = appState.batteryStat >= 80 ? `badge is-cyan` : `badge is-yellow`;
+      }
+    }
+
+    function routeTask(engine) {
+      if (appState.routerDone) return;
+      const idx = appState.routerIndex;
+      const task = ROUTER_TASKS[idx];
+      const outcome = task.feedback[engine];
+      const fbBox = document.getElementById('router-feedback-box');
+      const ft = document.getElementById('router-feedback-title');
+      const fd = document.getElementById('router-feedback-detail');
+      const nb = document.getElementById('router-next-btn');
+
+      ['cpu', 'gpu', 'npu'].forEach(function (eng) {
+        const b = document.getElementById('route-' + eng + '-btn');
+        if (b) b.disabled = true;
+        const box = document.getElementById('svg-' + eng + '-box');
+        if (box) {
+          box.setAttribute('stroke-width', eng === engine ? '3' : '1.5');
+          box.setAttribute('fill', eng === engine ? 'var(--surface-container-high)' : 'var(--surface-container)');
+        }
+      });
+
+      if (outcome.ok) {
+        appState.xp += 150;
+        appState.routerHits += 1;
+        appState.batteryStat = Math.min(98, appState.batteryStat + 2);
+        appState.quietStat = Math.min(98, appState.quietStat + 2);
+        appState.speedStat = Math.min(99, appState.speedStat + 3);
+        if (fbBox) fbBox.className = 'verdict-banner is-win';
+      } else {
+        appState.xp += 50;
+        appState.batteryStat = Math.max(58, appState.batteryStat - 10);
+        appState.quietStat = Math.max(55, appState.quietStat - 12);
+        appState.speedStat = Math.max(64, appState.speedStat - 6);
+        if (fbBox) fbBox.className = 'verdict-banner is-fail';
+      }
+
+      if (ft) ft.textContent = outcome.title;
+      if (fd) fd.textContent = outcome.detail;
+      if (fbBox) fbBox.style.display = 'flex';
+      if (nb) {
+        nb.textContent = idx >= ROUTER_TASKS.length - 1 ? `Finish Challenge 02` : `Next Workload`;
+        nb.onclick = nextRouterTask;
+      }
+
+      renderTelemetryMeters();
+      updateHud();
+      saveProgress();
+    }
+
+    function nextRouterTask() {
+      if (appState.routerIndex < ROUTER_TASKS.length - 1) {
+        appState.routerIndex += 1;
+      } else {
+        appState.routerDone = true;
+        appState.unlockedBadges.silicon = true;
+      }
+      renderRouterTask();
+      updateHud();
+      saveProgress();
+    }
+
+    /* --- STAGE 3: PRIVACY & OFFLINE SHOWDOWN --- */
+    function setNetworkMode(mode) {
+      appState.netMode = mode;
+      const onlineBtn = document.getElementById('net-online');
+      const offlineBtn = document.getElementById('net-offline');
+      if (onlineBtn) onlineBtn.setAttribute('aria-pressed', mode === 'online' ? 'true' : 'false');
+      if (offlineBtn) offlineBtn.setAttribute('aria-pressed', mode === 'offline' ? 'true' : 'false');
+      saveProgress();
+    }
+
+    function setPrivacyTask(taskKey) {
+      appState.privacyTask = taskKey;
+      ['adobe', 'pdf', 'captions'].forEach(function (k) {
+        const el = document.getElementById('work-' + k);
+        if (el) el.setAttribute('aria-pressed', k === taskKey ? 'true' : 'false');
+      });
+      const sumEl = document.getElementById('privacy-task-summary');
+      if (sumEl && PRIVACY_TASKS[taskKey]) {
+        sumEl.textContent = PRIVACY_TASKS[taskKey].summary;
+      }
+      saveProgress();
+    }
+
+    function runPrivacySimulation() {
+      const task = PRIVACY_TASKS[appState.privacyTask] || PRIVACY_TASKS.adobe;
+      const isOffline = appState.netMode === 'offline';
+
+      const cloudBadge = document.getElementById('cloud-status-badge');
+      const cloudBar = document.getElementById('cloud-progress-bar');
+      const cloudData = document.getElementById('cloud-data-stat');
+      const cloudTime = document.getElementById('cloud-time-stat');
+      const cloudNote = document.getElementById('cloud-outcome-note');
+
+      const localBadge = document.getElementById('local-status-badge');
+      const localBar = document.getElementById('local-progress-bar');
+      const localData = document.getElementById('local-data-stat');
+      const localTime = document.getElementById('local-time-stat');
+      const localNote = document.getElementById('local-outcome-note');
+      const stage3Badge = document.getElementById('stage3-badge');
+
+      if (localBar) localBar.style.width = '100%';
+      if (localBadge) {
+        localBadge.textContent = '100% On-Device';
+        localBadge.className = 'badge is-cyan';
+      }
+      if (localData) localData.textContent = `Data Uploaded: 0 KB (Private)`;
+      if (localTime) localTime.textContent = `Latency: 1.4s`;
+      if (localNote) localNote.textContent = isOffline ? task.localNoteOffline : task.localNoteOnline;
+
+      if (isOffline) {
+        if (cloudBar) cloudBar.style.width = '12%';
+        if (cloudBadge) {
+          cloudBadge.textContent = 'Offline Blocked';
+          cloudBadge.className = 'badge is-error';
+        }
+        if (cloudData) cloudData.textContent = `Data Uploaded: Blocked`;
+        if (cloudTime) cloudTime.textContent = `Latency: Timeout`;
+        if (cloudNote) cloudNote.textContent = task.cloudNoteOffline;
+      } else {
+        if (cloudBar) cloudBar.style.width = '100%';
+        if (cloudBadge) {
+          cloudBadge.textContent = 'Cloud Exposed';
+          cloudBadge.className = 'badge is-yellow';
+        }
+        if (cloudData) cloudData.textContent = `Data Uploaded: ` + task.cloudMB;
+        if (cloudTime) cloudTime.textContent = `Latency: 4.2s`;
+        if (cloudNote) cloudNote.textContent = task.cloudNoteOnline;
+      }
+
+      if (!appState.privacyDone) {
+        appState.xp += 150;
+        appState.privacyDone = true;
+        appState.unlockedBadges.privacy = true;
+      }
+      if (stage3Badge) stage3Badge.textContent = 'Verified Local';
+      updateHud();
+      saveProgress();
+    }
+
+    /* --- STAGE 4: COMPETITIVE BENCHMARK CHART --- */
+    function initOrUpdateChart() {
+      const canvas = document.getElementById('comparison-chart');
+      if (!canvas || typeof Chart === 'undefined') return;
+
+      const dataSet = BENCH_DATA[appState.benchMode] || BENCH_DATA.compat;
+      const pink = getCssToken('--data-1');
+      const cyan = getCssToken('--data-2');
+      const yellow = getCssToken('--data-3');
+      const muted = getCssToken('--data-context');
+      const pinkFill = getCssToken('--data-1-fill');
+      const cyanFill = getCssToken('--data-2-fill');
+      const yellowFill = getCssToken('--data-3-fill');
+      const mutedFill = getCssToken('--data-context-fill');
+      const textMain = getCssToken('--on-surface');
+      const textVar = getCssToken('--on-surface-variant');
+      const gridCol = getCssToken('--outline-variant');
+
+      const labels = [
+        `Intel Core Ultra (Series 2 / 3)`,
+        `AMD Ryzen AI (300 / 400)`,
+        `Qualcomm Snapdragon X (ARM)`,
+        `Legacy Non-NPU (13th Gen)`
+      ];
+
+      if (comparisonChart) {
+        comparisonChart.data.datasets[0].label = dataSet.label;
+        comparisonChart.data.datasets[0].data = dataSet.scores;
+        comparisonChart.update();
+        return;
+      }
+
+      comparisonChart = new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: dataSet.label,
+            data: dataSet.scores,
+            backgroundColor: [cyanFill, pinkFill, yellowFill, mutedFill],
+            borderColor: [cyan, pink, yellow, muted],
+            borderWidth: 1.5
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              labels: {
+                color: textMain,
+                font: { family: 'Space Mono, monospace', size: 11 }
+              }
+            }
+          },
+          scales: {
+            x: {
+              min: 0,
+              max: 100,
+              grid: { color: gridCol },
+              ticks: {
+                color: textVar,
+                font: { family: 'Space Mono, monospace', size: 11 }
+              }
+            },
+            y: {
+              grid: { display: false },
+              ticks: {
+                color: textMain,
+                font: { family: 'Inter, sans-serif', size: 12, weight: 600 }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function selectBenchmark(mode) {
+      appState.benchMode = mode;
+      ['compat', 'ai', 'battery', 'gaming'].forEach(function (k) {
+        const el = document.getElementById('bench-' + k);
+        if (el) el.setAttribute('aria-pressed', k === mode ? 'true' : 'false');
+      });
+      const dataSet = BENCH_DATA[mode] || BENCH_DATA.compat;
+      const titleEl = document.getElementById('bench-insight-title');
+      const textEl = document.getElementById('bench-insight-text');
+      if (titleEl) titleEl.textContent = dataSet.title;
+      if (textEl) textEl.textContent = dataSet.text;
+
+      if (!appState.benchDone) {
+        appState.xp += 100;
+        appState.benchDone = true;
+        appState.unlockedBadges.x86 = true;
+      }
+      initOrUpdateChart();
+      updateHud();
+      saveProgress();
+    }
+
+    /* --- STAGE 5: PERSONALIZED RECOMMENDATION & STORE PASS --- */
+    function syncBatteryPriority(val) {
+      const hours = parseInt(val, 10) || 14;
+      appState.batteryHours = hours;
+      const lbl = document.getElementById('battery-hours-label');
+      if (lbl) lbl.textContent = hours + ` hrs`;
+      if (hours >= 18 && appState.budgetTier === 'entry') {
+        appState.budgetTier = 'mainstream';
+        const sel = document.getElementById('budget-select');
+        if (sel) sel.value = 'mainstream';
+      }
+      updateRecommendation();
+      saveProgress();
+    }
+
+    function updateRecommendation() {
+      const sel = document.getElementById('budget-select');
+      if (sel) appState.budgetTier = sel.value;
+
+      let tier = appState.budgetTier;
+      if (appState.vibe === 'creator' && tier === 'entry') {
+        tier = 'mainstream';
+      }
+
+      const modelTitle = document.getElementById('pass-model-title');
+      const topsBadge = document.getElementById('pass-tops-badge');
+      const whyText = document.getElementById('pass-why-text');
+      const chipSpec = document.getElementById('check-chip-spec');
+      const ramSpec = document.getElementById('check-ram-spec');
+      const gpuSpec = document.getElementById('check-gpu-spec');
+      const stickerSpec = document.getElementById('check-sticker-spec');
+
+      const vibeNames = {
+        campus: `Campus & Coding`,
+        creator: `Creator & Reels`,
+        hustle: `Work & Meetings`,
+        gaming: `Gaming & Everyday`
+      };
+      const vibeLabel = vibeNames[appState.vibe] || `Everyday`;
+
+      if (tier === 'flagship') {
+        if (modelTitle) modelTitle.textContent = `Intel Core Ultra Series 3 (300 Series) — Flagship AI PC`;
+        if (topsBadge) topsBadge.textContent = `50 NPU TOPS // UP TO 180 PLATFORM TOPS`;
+        if (whyText) whyText.textContent = `Built for your ` + vibeLabel + ` workflow: Intel 18A Panther Lake silicon with 50 NPU TOPS, Xe3 Arc Graphics, up to 27-hr streaming endurance class, and 100% native x86 compatibility for pro apps, local LLMs, and gaming.`;
+        if (chipSpec) chipSpec.textContent = `Core Ultra 7 / 9 Series 3`;
+        if (ramSpec) ramSpec.textContent = `32GB RAM (Pro Local AI)`;
+        if (gpuSpec) gpuSpec.textContent = `Intel Arc Xe3 (or dGPU for 3D)`;
+        if (stickerSpec) stickerSpec.textContent = `Copilot+ PC + Core Ultra Series 3`;
+      } else if (tier === 'entry') {
+        if (modelTitle) modelTitle.textContent = `Intel Core Ultra 5 225U / Series 1 — Smart Value AI PC`;
+        if (topsBadge) topsBadge.textContent = `12 NPU TOPS // ENTRY AI PC`;
+        if (whyText) whyText.textContent = `Smart value for ` + vibeLabel + ` when budget comes first: avoids non-NPU legacy traps by adding an entry NPU (12 TOPS) for Studio Effects video calls, 16GB RAM, and full x86 Windows speed—note it is Entry AI, not Copilot+ 40+ TOPS.`;
+        if (chipSpec) chipSpec.textContent = `Intel Core Ultra 5 225U (12 TOPS)`;
+        if (ramSpec) ramSpec.textContent = `16GB RAM / 512GB SSD`;
+        if (gpuSpec) gpuSpec.textContent = `Intel Graphics (64 EUs)`;
+        if (stickerSpec) stickerSpec.textContent = `Intel Core Ultra + 16GB RAM`;
+      } else {
+        if (modelTitle) modelTitle.textContent = `Intel Core Ultra Series 2 (200V) — Copilot+ Ultrathin`;
+        if (topsBadge) topsBadge.textContent = `40+ NPU TOPS // UP TO 120 PLATFORM TOPS`;
+        if (whyText) whyText.textContent = `Sweet spot for ` + vibeLabel + ` (` + appState.batteryHours + `+ hr target): clears Microsoft's 40+ NPU TOPS bar for local Copilot+ tools, delivers ultra-efficient battery life, accelerates Adobe/Teams, and runs every x86 app natively.`;
+        if (chipSpec) chipSpec.textContent = `Intel Core Ultra 5 / 7 200V`;
+        if (ramSpec) ramSpec.textContent = `16GB–32GB RAM`;
+        if (gpuSpec) gpuSpec.textContent = `Intel Arc Graphics (Xe2)`;
+        if (stickerSpec) stickerSpec.textContent = `Copilot+ PC + Core Ultra 200V`;
+      }
+      saveProgress();
+    }
+
+    function buildPassSummaryText() {
+      const titleEl = document.getElementById('pass-model-title');
+      const chipEl = document.getElementById('check-chip-spec');
+      const ramEl = document.getElementById('check-ram-spec');
+      const gpuEl = document.getElementById('check-gpu-spec');
+      const model = titleEl ? titleEl.textContent : `Intel Core Ultra AI PC`;
+      const chip = chipEl ? chipEl.textContent : `Intel Core Ultra`;
+      const ram = ramEl ? ramEl.textContent : `16GB+ RAM`;
+      const gpu = gpuEl ? gpuEl.textContent : `Intel Arc Graphics`;
+
+      return [
+        `INTEL AI PC STORE PASS — ` + appState.store.toUpperCase(),
+        `========================================`,
+        `Recommended Tier: ` + model,
+        `Processor Spec: ` + chip,
+        `Minimum Memory: ` + ram,
+        `Graphics: ` + gpu,
+        `Architecture: Native Windows x86 (Zero ARM Emulation)`,
+        `Quest XP Earned: ` + appState.xp + ` XP`,
+        ``,
+        `Ask your ` + appState.store + ` advisor:`,
+        `"Please show me laptops with ` + chip + `, at least ` + ram + `, and an Intel NPU so I can run AI locally with all-day battery."`
+      ].join('\n');
+    }
+
+    function downloadStorePass() {
+      const content = buildPassSummaryText();
+      const msgEl = document.getElementById('action-status-msg');
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.triggerFileDownload === 'function') {
+          window.notebookAppApi.triggerFileDownload({
+            content: content,
+            contentType: 'text/plain',
+            encoding: 'UTF-8',
+            filename: 'intel-ai-pc-store-pass.txt'
+          });
+          if (msgEl) msgEl.textContent = `Store Pass downloaded as intel-ai-pc-store-pass.txt`;
+          return;
+        }
+      } catch (err) {
+        // Fallback below
+      }
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'intel-ai-pc-store-pass.txt';
+      link.click();
+      URL.revokeObjectURL(url);
+      if (msgEl) msgEl.textContent = `Store Pass downloaded as intel-ai-pc-store-pass.txt`;
+    }
+
+    function copyAdvisorPitch() {
+      const pitch = buildPassSummaryText();
+      const lbl = document.getElementById('copy-pitch-label');
+      const msgEl = document.getElementById('action-status-msg');
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(pitch).then(function () {
+          if (lbl) lbl.textContent = `Copied to Clipboard`;
+          if (msgEl) msgEl.textContent = `Advisor checklist copied—show this at the counter.`;
+        }).catch(function () {
+          if (msgEl) msgEl.textContent = `Ready! Use Download Store Spec Pass to save your checklist.`;
+        });
+      } else {
+        if (msgEl) msgEl.textContent = `Ready! Use Download Store Spec Pass to save your checklist.`;
+      }
+    }
+
+    function resetQuest(btn) {
+      if (!btn) return;
+      if (btn.dataset.armed !== 'true') {
+        btn.dataset.armed = 'true';
+        btn.textContent = `Tap Again to Confirm Reset`;
+        return;
+      }
+      btn.dataset.armed = 'false';
+      btn.textContent = `Reset Run`;
+
+      appState = {
+        store: `Reliance Digital`,
+        vibe: `campus`,
+        xp: 0,
+        trapRound: 0,
+        trapHits: 0,
+        trapDone: false,
+        routerIndex: 0,
+        routerHits: 0,
+        routerDone: false,
+        batteryStat: 92,
+        quietStat: 95,
+        speedStat: 88,
+        netMode: `online`,
+        privacyTask: `adobe`,
+        privacyDone: false,
+        benchMode: `compat`,
+        benchDone: false,
+        budgetTier: `mainstream`,
+        batteryHours: 14,
+        unlockedBadges: { trap: false, silicon: false, privacy: false, x86: false }
+      };
+
+      const msgEl = document.getElementById('action-status-msg');
+      if (msgEl) msgEl.textContent = ``;
+      const copyLbl = document.getElementById('copy-pitch-label');
+      if (copyLbl) copyLbl.textContent = `Copy Store Advisor Ask`;
+
+      syncAllUI();
+      saveProgress();
+    }
+
+    /* --- HUD & MASTER UI SYNC --- */
+    function updateHud() {
+      const xpEl = document.getElementById('hud-xp');
+      const rankEl = document.getElementById('hud-rank');
+      const pctEl = document.getElementById('hud-progress-pct');
+      const barEl = document.getElementById('hud-progress-bar');
+
+      if (xpEl) xpEl.textContent = String(appState.xp);
+
+      let completedStages = 0;
+      if (appState.trapDone) completedStages += 1;
+      if (appState.routerDone) completedStages += 1;
+      if (appState.privacyDone) completedStages += 1;
+      if (appState.benchDone) completedStages += 1;
+
+      const pct = Math.round((completedStages / 4) * 100);
+      if (pctEl) pctEl.textContent = pct + `%`;
+      if (barEl) barEl.style.width = pct + `%`;
+
+      if (rankEl) {
+        if (completedStages === 4) rankEl.textContent = `AI PC Pro`;
+        else if (completedStages >= 2) rankEl.textContent = `Spec Scout`;
+        else if (appState.xp > 0) rankEl.textContent = `Explorer`;
+        else rankEl.textContent = `Rookie`;
+      }
+
+      const navStatusMap = [
+        { id: 1, done: appState.trapDone },
+        { id: 2, done: appState.routerDone },
+        { id: 3, done: appState.privacyDone },
+        { id: 4, done: appState.benchDone }
+      ];
+      navStatusMap.forEach(function (item) {
+        const btn = document.getElementById('nav-stage-' + item.id);
+        const st = document.getElementById('nav-status-' + item.id);
+        if (btn) btn.classList.toggle('is-done', item.done);
+        if (st) st.textContent = item.done ? `Cleared` : `Play`;
+      });
+
+      const badgeMap = {
+        trap: 'badge-trap',
+        silicon: 'badge-silicon',
+        privacy: 'badge-privacy',
+        x86: 'badge-x86'
+      };
+      Object.keys(badgeMap).forEach(function (k) {
+        const el = document.getElementById(badgeMap[k]);
+        if (el) {
+          el.className = appState.unlockedBadges[k] ? 'badge is-cyan' : 'badge';
+        }
+      });
+
+      const tipEl = document.getElementById('hud-tip-text');
+      if (tipEl) {
+        tipEl.textContent = completedStages === 4
+          ? `All 4 challenges cleared! Scroll to Step 05 to grab your custom Intel AI PC store pass.`
+          : `Complete Challenges 01–04 to verify your AI PC specs before talking to a store advisor.`;
+      }
+    }
+
+    function syncAllUI() {
+      selectStore(appState.store);
+      selectVibe(appState.vibe);
+      renderTrapRound();
+      renderRouterTask();
+      setNetworkMode(appState.netMode);
+      setPrivacyTask(appState.privacyTask);
+      if (appState.privacyDone) {
+        runPrivacySimulation();
+      }
+      const sel = document.getElementById('budget-select');
+      if (sel) sel.value = appState.budgetTier;
+      const rng = document.getElementById('battery-priority');
+      if (rng) rng.value = String(appState.batteryHours);
+      const lbl = document.getElementById('battery-hours-label');
+      if (lbl) lbl.textContent = appState.batteryHours + ` hrs`;
+
+      selectBenchmark(appState.benchMode);
+      updateRecommendation();
+      updateHud();
+    }
+
+    /* --- INITIALIZATION --- */
+    async function initApp() {
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.getAppState === 'function') {
+          const saved = await window.notebookAppApi.getAppState();
+          if (saved && typeof saved === 'object') {
+            appState = Object.assign({}, appState, saved);
+            if (saved.unlockedBadges) {
+              appState.unlockedBadges = Object.assign({}, appState.unlockedBadges, saved.unlockedBadges);
+            }
+          }
+        }
+      } catch (err) {
+        // Start fresh
+      }
+
+      if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+        lucide.createIcons();
+      }
+
+      // Initialize UI without falsely awarding Stage 4 XP on first boot
+      const wasBenchDone = appState.benchDone;
+      const prevXp = appState.xp;
+      syncAllUI();
+      if (!wasBenchDone) {
+        appState.benchDone = false;
+        appState.xp = prevXp;
+        appState.unlockedBadges.x86 = false;
+        updateHud();
+      }
+
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.notifyAppReady === 'function') {
+          window.notebookAppApi.notifyAppReady();
+        }
+      } catch (err) {
+        // Ignore outside host
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>

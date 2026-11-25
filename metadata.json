@@ -1,0 +1,6 @@
+{
+  "name": "Intel AI PC Challenge",
+  "description": "Interactive in-store persuasion games for Gen Z laptop shoppers at Reliance Digital, Croma, and Vijay Sales.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
